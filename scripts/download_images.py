@@ -29,7 +29,8 @@ DERIVATIVE_CODE = sys.argv[3]
 
 # config
 overwriteExisting = False
-imageURLPattern = "http://images.nypl.org/index.php?id=%s&t=" + DERIVATIVE_CODE
+imageURLPattern = 'https://webapps.cspace.berkeley.edu/pahma/imageserver/blobs/%s/derivatives/Thumbnail/content'
+#imageURLPattern = "http://images.nypl.org/index.php?id=%s&t=" + DERIVATIVE_CODE
 imageExt = "jpg"
 
 items = []

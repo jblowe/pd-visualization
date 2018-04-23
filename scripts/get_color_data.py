@@ -142,9 +142,12 @@ for i, captureId in enumerate(items):
         if len(weighted_colors) > 0:
             c = chooseColor(weighted_colors)
             hsl = [c.color.hue, c.color.saturation, c.color.luminance]
-        item_colors.append([hsl, c.weight])
+        try:
+            item_colors.append([hsl, c.weight])
+        except:
+            item_colors.append([hsl, 0.0])
 
-    sys.stdout.write('\r')
+    sys.stdout.write('\n')
     sys.stdout.write(str(round(1.0*i/itemCount*100,3))+'%')
     sys.stdout.flush()
 

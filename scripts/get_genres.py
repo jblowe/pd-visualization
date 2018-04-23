@@ -4,7 +4,7 @@
 # Example usage:
 #   python get_genres.py ../data/src/pd_items.json ../data/genres.json ../data/item_genres.json
 
-from collections import Counter
+import Counter
 import json
 from pprint import pprint
 import re
@@ -54,6 +54,7 @@ substrings = {
 # init
 genres = []
 item_genres = []
+urltemplate = "https://webapps.cspace.berkeley.edu/pahma/search/search/?fcp_qualifier=keyword&displayType=list&maxresults=50&start=1i&fcp="
 
 def addGenre(g):
     global genres
@@ -67,8 +68,8 @@ def addGenre(g):
         label = 'Unknown'
         url = ''
         if g:
-            label = g.capitalize()
-            url = 'http://digitalcollections.nypl.org/search/index?utf8=✓&keywords=&filters%5Brights%5D=pd&filters%5Bgenre%5D=' + urllib.quote(label)
+            label = g
+            url = urltemplate + urllib.quote(label)
         genre = {
             'index': len(genres),
             'value': g,
@@ -80,31 +81,18 @@ def addGenre(g):
 
     item_genres.append(genre['index'])
 
-for line in open(INPUT_FILE,'r').readlines():
-    # Read line as json
-    item = json.loads(line)
+for line in open(INPUT_FILE,'rb').readlines():
+    # Read line
+    items = line.split('\t')
 
     # Retrieve genre
-    genre = ""
-    if "genres" in item and len(item["genres"]) > 0:
-        for g in item["genres"]:
-            g = str(g["text"].encode("utf_8"))
-            # Make lowercase exclude everything after divider
-            g = g.lower().split(" -- ")[0]
-            # Remove non-ASCII chars
-            g = re.sub(r'[^\x00-\x7F]+','', g)
-            # Trim string
-            g = g.strip()
-            for s in substrings:
-                if s in g:
-                    g = substrings[s]
-                    break
-            genre = g
-            break
+    genrex = items[41].split('|')
+    genre = genrex[1] if len(genrex) > 1 else genrex[0]
     addGenre(genre)
 
 # Report on collections
 genres = sorted(genres, key=lambda d: d['count'], reverse=True)
+genres = [ g for g in genres if g['count'] > 10 ]
 pprint(genres)
 
 # Write out data

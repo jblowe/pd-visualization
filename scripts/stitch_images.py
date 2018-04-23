@@ -144,10 +144,11 @@ for g in groups:
                 imageBase.paste(im, (x, y))
                 # print "Pasted " + fileName
 
-                sys.stdout.write('\r')
+                sys.stdout.write('\n')
                 sys.stdout.write(str(round(1.0*count/itemCount*100,3))+'%')
                 sys.stdout.flush()
             except IOError:
+                raise
                 # print "Cannot read file: " + fileName
                 failCount += 1
             except:
@@ -173,7 +174,8 @@ for g in groups:
 # Save image
 print "Saving stiched image..."
 
-outputfile = OUTPUT_IMAGE_DIR + DATA_GROUP + "_" + str(ITEMS_PER_ROW) + "_" + str(ITEM_W) + "_" + str(ITEM_H) + "." + imageExt
+outputfile = OUTPUT_IMAGE_DIR + DATA_GROUP + "_" + str(ITEMS_PER_ROW) + "_" + str(ITEM_W) + "_" + str(ITEM_H) + ".png" 
+#outputfile = OUTPUT_IMAGE_DIR + DATA_GROUP + "_" + str(ITEMS_PER_ROW) + "_" + str(ITEM_W) + "_" + str(ITEM_H) + "." + imageExt
 imageBase.save(outputfile)
 
 print "Saved image: " + outputfile

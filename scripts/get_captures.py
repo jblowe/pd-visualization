@@ -26,14 +26,15 @@ captureIds = []
 noCaptureCount = 0
 invalidCaptureCount = 0
 
-for line in open(INPUT_FILE,'r').readlines():
-    # Read line as json
-    item = json.loads(line)
+for line in open(INPUT_FILE,'rb').readlines():
+    # Read line
+    items = line.split('\t')
 
     # Retrieve capture ids of item's first capture
-    captureId = ""
-    if "captureIds" in item and len(item["captureIds"]) > 0:
-        captureId = item["captureIds"][0].strip()
+    captureId = items[44].split(',')
+    captureId = captureId[0]
+    if captureId != "":
+        pass
     else:
         noCaptureCount += 1
 

@@ -5,7 +5,7 @@
 #   python get_dates.py ../data/src/pd_items.json ../data/dates.json ../data/item_dates.json year
 #   python get_dates.py ../data/src/pd_items.json ../data/centuries.json ../data/item_centuries.json century
 
-from collections import Counter
+import Counter
 import json
 import math
 from pprint import pprint
@@ -21,10 +21,12 @@ OUTPUT_FILE = sys.argv[2]
 OUTPUT_ITEMS_FILE = sys.argv[3]
 TIME_UNIT = sys.argv[4]
 
+urltemplate = 'https://webapps.cspace.berkeley.edu/pahma/search/search/?colldate=%s??&colldate_qualifier=keyword&displayType=list&maxresults=50&start=1'
+
 # config
 yearPattern = '[^0-9]*([12][0-9]{3}).*'
 minYear = 1000
-maxYear = 2015
+maxYear = 2018
 
 # init
 dates = []
@@ -70,13 +72,13 @@ def addDate(d):
         url = ''
         if d:
             label = str(d)
-            url = 'http://digitalcollections.nypl.org/search/index?utf8=✓&keywords=&filters%5Brights%5D=pd&year_begin='+label+'&year_end='+label
+            url = urltemplate % label
             if TIME_UNIT == 'century':
                 if d==21:
                     label += "st century"
                 else:
                     label += "th century"
-                url = 'http://digitalcollections.nypl.org/search/index?utf8=✓&keywords=&filters%5Brights%5D=pd&year_begin='+str(d-1)+'00&year_end='+str(d)+'00'
+                url = urltemplate % str(d)
         date = {
             'index': len(dates),
             'value': d,
@@ -88,30 +90,27 @@ def addDate(d):
 
     item_dates.append(date['index'])
 
-for line in open(INPUT_FILE,'r').readlines():
-    # Read line as json
-    item = json.loads(line)
+
+
+for line in open(INPUT_FILE,'rb').readlines():
+    # Read line
+    items = line.split('\t')
 
     # Retrieve date
-    date = ""
-    if "dates" in item and len(item["dates"]) > 0:
+    date = items[51]
+    if 'colldate' in date: date = ''
 
-        # Give precedance to date created
-        itemDates = [d for d in item["dates"] if d['field']=='dateCreated']
-        if len(itemDates) <= 0:
-            itemDates = item["dates"]
+    if date != '':
 
-        # Look for the first valid year
-        for d in itemDates:
-            year = getYearFromString(d['value'])
+            year = int(date)
             if year and year > minYear and year < maxYear:
                 date = year
                 if TIME_UNIT == 'century':
                     date = int(math.floor(1.0 * year / 100)) + 1
-                break
         # if not date:
         #     print "No date found for: "
         #     pprint(item["date"])
+
     addDate(date)
 
 # Report on dates

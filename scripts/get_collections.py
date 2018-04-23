@@ -5,12 +5,13 @@
 #   python get_collections.py ../data/src/pd_items.json ../data/collections.json ../data/item_collections.json
 
 import codecs
-from collections import Counter
+import Counter
 import json
 from pprint import pprint
 import re
 import sys
 
+urltemplate = 'https://webapps.cspace.berkeley.edu/pahma/search/search/?dept=%s&dept_qualifier=phrase&displayType=full&maxresults=50&start=1'
 # input
 if len(sys.argv) < 3:
     print "Usage: %s <inputfile items json> <outputfile collections json> <outputfile item collections json>" % sys.argv[0]
@@ -36,7 +37,7 @@ def addCollection(title, uuid):
         url = ''
         if title:
             label = title
-            url = 'http://digitalcollections.nypl.org/collections/' + uuid
+            url = urltemplate % uuid
         collection = {
             'index': len(collections),
             'value': uuid,
@@ -49,23 +50,19 @@ def addCollection(title, uuid):
     item_collections.append(collection['index'])
 
 with codecs.open(INPUT_FILE, encoding='utf-8') as infile:
+
     for line in infile:
         # Read line as json
-        item = json.loads(line)
-
-        uuid = ""
-        if "collectionUuid" in item and item["collectionUuid"]:
-            uuid = item["collectionUuid"].strip()
-
-        # Retrieve collection title
-        title = ""
-        if "collectionTitle" in item and item["collectionTitle"]:
-            title = item["collectionTitle"].encode("utf-8").strip()
+        items = line.split('\t')
+        # Retrieve uuid and title
+        uuid = items[4].split(':')[0].split('-')[0]
+        title = items[4]
 
         addCollection(title, uuid)
 
 # Report on collections
 collections = sorted(collections, key=lambda d: d['count'], reverse=True)
+collections = [ g for g in collections if g['count'] > 10 ]
 pprint(collections)
 
 # Write out data
